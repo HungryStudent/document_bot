@@ -6,11 +6,15 @@ class ChangeProvider(StatesGroup):
     enter_address = State()
     enter_inn = State()
     enter_ogrn = State()
-    enter_payment = State()
     enter_bank = State()
-    enter_correspondent = State()
-    enter_bik = State()
     enter_phone = State()
     enter_email = State()
     enter_director = State()
     check = State()
+
+
+class AddBank(StatesGroup):
+    enter_name = State()
+    enter_bik = State()
+    enter_payment = State()
+    enter_correspondent = State()

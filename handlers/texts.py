@@ -1,5 +1,6 @@
 admin_hello_text = "Вы вошли как администратор"
 cancel_input = "Ввод остановлен"
+banks_menu = "Список банков"
 
 
 class Provider:
@@ -7,10 +8,7 @@ class Provider:
     enter_address = "Введите адрес"
     enter_inn = "Введите ИНН"
     enter_ogrn = "Введите ОГРН"
-    enter_payment = "Введите расчетный счёт"
-    enter_bank = "Введите банк"
-    enter_correspondent = "Введите корреспондентский счёт"
-    enter_bik = "Введите БИК"
+    enter_bank_id = "Выберите банк"
     enter_phone = "Введите телефон"
     enter_email = "Введите e-mail"
     enter_director = "Введите ФИО директора"
@@ -21,7 +19,7 @@ class Provider:
 ИНН/КПП {inn}
 ОГРН {ogrn}
 р/с {payment}
-{bank}
+{bank_name}
 к/с {correspondent}
 БИК {bik}
 Тел.: {phone}
@@ -32,3 +30,11 @@ E-mail: {email}
 Обновляем поставщика?
 """
     finish = "Поставщик обновлен"
+
+
+class Bank:
+    enter_name = "Введите название банка"
+    enter_bik = "Введите БИК"
+    enter_correspondent = "Введите корреспондентский счёт"
+    enter_payment = "Введите расчетный счёт"
+    finish = "Банк добавлен"
