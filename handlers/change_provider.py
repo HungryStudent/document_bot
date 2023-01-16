@@ -21,7 +21,7 @@ async def start_change_provider(message: Message):
     await states.ChangeProvider.enter_name.set()
 
 
-@dp.message_handler(state="*", text="Отмена")
+@dp.message_handler(lambda m: m.from_user.id in admin_ids, state="*", text="Отмена")
 async def cancel_change_provider(message: Message, state: FSMContext):
     await state.finish()
     await message.answer(texts.cancel_input, reply_markup=admin_kb.menu)
@@ -83,19 +83,6 @@ async def enter_email(message: Message, state: FSMContext):
 
     await message.answer(texts.Provider.enter_director)
     await states.ChangeProvider.next()
-
-
-@dp.message_handler(state=states.ChangeProvider.enter_director)
-async def enter_director(message: Message, state: FSMContext):
-    await state.update_data(director=message.text)
-    provider_data = await state.get_data()
-    await states.ChangeProvider.next()
-    bank_data = db.get_bank(provider_data["bank_id"])
-    provider_data["bank_name"] = bank_data["name"]
-    provider_data["bik"] = bank_data["bik"]
-    provider_data["payment"] = bank_data["payment"]
-    provider_data["correspondent"] = bank_data["correspondent"]
-    await message.answer(texts.Provider.check.format(**provider_data), reply_markup=admin_kb.accept_new_provider)
 
 
 @dp.callback_query_handler(Text(startswith="new_provider"), state=states.ChangeProvider.check)

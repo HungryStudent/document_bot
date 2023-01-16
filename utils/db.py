@@ -42,12 +42,16 @@ def get_banks():
         cursor.execute("SELECT id, name FROM banks")
         return cursor.fetchall()
 
+
 def get_bank(bank_id):
     with closing(sqlite3.connect(database)) as connection:
         connection.row_factory = dict_factory
         cursor: Cursor = connection.cursor()
-        cursor.execute("SELECT * FROM banks WHERE id = ?", (bank_id,))
+        cursor.execute(
+            "SELECT name as provider_bank_name, payment as provider_payment, correspondent as provider_correspondent, bik as provider_bik FROM banks WHERE id = ?",
+            (bank_id,))
         return cursor.fetchone()
+
 
 def add_bank(bank_data):
     with closing(sqlite3.connect(database)) as connection:

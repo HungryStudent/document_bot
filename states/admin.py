@@ -9,7 +9,8 @@ class ChangeProvider(StatesGroup):
     enter_bank = State()
     enter_phone = State()
     enter_email = State()
-    enter_director = State()
+    enter_role = State()
+    enter_parent_case_role = State()
     check = State()
 
 

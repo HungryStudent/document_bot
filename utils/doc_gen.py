@@ -1,17 +1,21 @@
+import datetime
+
 from docxtpl import DocxTemplate
 from docx2pdf import convert
 
-convert("documents/шаблон-fial.docx", "documents/output.pdf")
 
 
 def convert_to_pdf(data):
-    pass
+    convert("documents/шаблон-fial.docx", "documents/output.pdf")
 
 
-def get_docx(data):
+def get_docx(context):
     pass
-    doc = DocxTemplate("documents/шаблон-fin2al.docx")
-    context = {}
-    doc.replace_media("photo1.jpg", "photo2.jpg")
+    print(context)
+    doc = DocxTemplate("documents/template.docx")
     doc.render(context)
-    doc.save("шаблон-fial.docx")
+    today = datetime.datetime.now()
+    name = today.strftime('%d-%m-%y_%H-%M') + ".docx"
+    doc.save(name)
+    return name
+

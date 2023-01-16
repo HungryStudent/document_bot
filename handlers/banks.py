@@ -20,7 +20,7 @@ async def show_banks_menu(message: Message):
     await message.answer(texts.banks_menu, reply_markup=admin_kb.get_banks_menu())
 
 
-@dp.message_handler(state="*", text="Отмена")
+@dp.message_handler(lambda m: m.from_user.id in admin_ids, state="*", text="Отмена")
 async def cancel_change_provider(message: Message, state: FSMContext):
     await state.finish()
     await message.answer(texts.cancel_input, reply_markup=admin_kb.menu)
