@@ -182,7 +182,7 @@ async def enter_provider_bank(call: CallbackQuery, state: FSMContext, callback_d
     await state.update_data(provider_bank=callback_data["id"])
 
     document_data = await state.get_data()
-    document_data = document_data | db.get_bank(document_data["provider_bank"])
+    document_data = {**document_data, **db.get_bank(document_data["provider_bank"])}
     document_data[
         "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
     name = doc_gen.get_docx(document_data)
