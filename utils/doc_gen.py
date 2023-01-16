@@ -9,8 +9,6 @@ def convert_to_pdf(data):
 
 
 def get_docx(context):
-    pass
-    print(context)
     doc = DocxTemplate("documents/template.docx")
     doc.render(context)
     today = datetime.datetime.now()
