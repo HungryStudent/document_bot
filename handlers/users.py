@@ -188,3 +188,4 @@ async def enter_provider_bank(call: CallbackQuery, state: FSMContext, callback_d
     name = doc_gen.get_docx(document_data)
     await call.message.answer_document(open(name, "rb"), caption=texts.CreateDocument.finish)
     await call.answer()
+    await state.finish()
