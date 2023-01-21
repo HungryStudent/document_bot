@@ -258,7 +258,6 @@ async def enter_price_product(message: Message, state: FSMContext):
         products = ""
         summa = 0
         for product in data["products"]:
-            print(product)
             products += texts.CreateDocument.product_info.format(**product)
             summa += product["cost"]
         data["summa"] = summa
