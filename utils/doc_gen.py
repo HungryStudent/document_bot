@@ -4,8 +4,9 @@ from docxtpl import DocxTemplate
 from docx2pdf import convert
 
 
-def convert_to_pdf(data):
-    convert("documents/шаблон-fial.docx", "documents/output.pdf")
+def convert_to_pdf(name):
+    convert(name, name[:-4]+".pdf")
+    return name[:-4]+".pdf"
 
 
 def get_docx(context):
