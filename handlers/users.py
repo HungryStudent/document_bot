@@ -280,7 +280,8 @@ async def enter_doc_type(call: CallbackQuery, state: FSMContext):
     document_data["tbl_contents"] = document_data["products"]
     name = doc_gen.get_docx(document_data)
     if doc_type == DocTypes.pdf.value:
-        name = doc_gen.convert_to_pdf(name)
+        return
+        # name = doc_gen.convert_to_pdf(name)
 
     await call.message.answer_document(open(name, "rb"), caption=texts.CreateDocument.finish)
     await state.finish()
