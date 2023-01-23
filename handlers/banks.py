@@ -32,11 +32,14 @@ async def start_add_bank(call: CallbackQuery):
     await call.message.answer(texts.Bank.enter_name, reply_markup=admin_kb.cancel)
     await call.answer()
 
+
 @dp.message_handler(state=states.AddBank.enter_name)
 async def enter_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
 
     await message.answer(texts.Bank.enter_bik)
+    await message.bot.delete_message(message.chat.id, message.message_id-1)
+    await message.delete()
     await states.AddBank.next()
 
 
@@ -45,6 +48,8 @@ async def enter_bik(message: Message, state: FSMContext):
     await state.update_data(bik=message.text)
 
     await message.answer(texts.Bank.enter_payment)
+    await message.bot.delete_message(message.chat.id, message.message_id - 1)
+    await message.delete()
     await states.AddBank.next()
 
 
@@ -53,6 +58,8 @@ async def enter_payment(message: Message, state: FSMContext):
     await state.update_data(payment=message.text)
 
     await message.answer(texts.Bank.enter_correspondent)
+    await message.bot.delete_message(message.chat.id, message.message_id - 1)
+    await message.delete()
     await states.AddBank.next()
 
 
@@ -62,4 +69,6 @@ async def enter_correspondent(message: Message, state: FSMContext):
     bank_data = await state.get_data()
     db.add_bank(bank_data)
     await message.answer(texts.Bank.finish, reply_markup=admin_kb.menu)
-    await states.AddBank.next()
+    await message.bot.delete_message(message.chat.id, message.message_id - 1)
+    await message.delete()
+    await state.finish()
