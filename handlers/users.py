@@ -239,6 +239,20 @@ async def enter_email(message: Message, state: FSMContext):
 @dp.callback_query_handler(state=states.CreateDocument.enter_product)
 async def enter_product(call: CallbackQuery, state: FSMContext):
     if call.data == "finish_product":
+        document_data = await state.get_data()
+        document_data = {**document_data, **db.get_bank(document_data["provider_bank"])}
+        document_data[
+            "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
+        document_data["tbl_contents"] = document_data["products"]
+        document_data["short_name"] = document_data["name"].replace("ООО ", "")
+        name = doc_gen.get_docx(document_data)
+
+        await call.message.answer_document(open(name + ".docx", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.delete()
+        await state.finish()
+        await call.answer()
+
         await states.CreateDocument.enter_doc_type.set()
         await call.message.answer(texts.CreateDocument.enter_doc_type, reply_markup=user_kb.doc_type)
         await call.answer()
@@ -263,8 +277,9 @@ async def enter_name_product(message: Message, state: FSMContext):
 
 @dp.message_handler(state=states.CreateDocument.enter_count_product)
 async def enter_count_product(message: Message, state: FSMContext):
+    count_product = message.text.replace(",", ".")
     try:
-        await state.update_data(count_product=float(message.text))
+        await state.update_data(count_product=float(count_product))
     except ValueError:
         await message.answer("Введите число!")
         return
@@ -287,8 +302,9 @@ async def enter_type_product(call: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state=states.CreateDocument.enter_price_product)
 async def enter_price_product(message: Message, state: FSMContext):
+    price_product = message.text.replace(",", ".")
     try:
-        await state.update_data(price_product=float(message.text))
+        await state.update_data(price_product=float(price_product))
     except ValueError:
         await message.answer("Введите число!")
         return
@@ -305,7 +321,7 @@ async def enter_price_product(message: Message, state: FSMContext):
             products += texts.CreateDocument.product_info.format(**product)
             summa += product["cost"]
         data["summa"] = round(summa, 2)
-        data["nds_summa"] = round(summa*data["nds"]*0.01, 2)
+        data["nds_summa"] = round(summa * data["nds"] * 0.01, 2)
         count = len(data["products"])
         msg_text = texts.CreateDocument.new_product.format(
             **data["products"][-1]) + products + texts.CreateDocument.products_stats.format(summa=summa, count=count)
@@ -319,18 +335,4 @@ async def enter_price_product(message: Message, state: FSMContext):
 @dp.callback_query_handler(Text(startswith="doc_type"), state=states.CreateDocument.enter_doc_type)
 async def enter_doc_type(call: CallbackQuery, state: FSMContext):
     doc_type = int(call.data.split(":")[1])
-    doc_data = await state.get_data()
-    document_data = await state.get_data()
-    document_data = {**document_data, **db.get_bank(document_data["provider_bank"])}
-    document_data[
-        "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
-    document_data["tbl_contents"] = document_data["products"]
-    name = doc_gen.get_docx(document_data)
-    if doc_type == DocTypes.pdf.value:
-        return
-        # name = doc_gen.convert_to_pdf(name)
 
-    await call.message.answer_document(open(name, "rb"), caption=texts.CreateDocument.finish)
-    await call.message.delete()
-    await state.finish()
-    await call.answer()
