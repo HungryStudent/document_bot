@@ -1,16 +1,30 @@
+from enum import Enum
+
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, CallbackQuery
-from handlers import texts
-from create_bot import dp
+
 import keyboards.admin as admin_kb
 import keyboards.user as user_kb
-from utils import db
 from config import admin_ids
+from create_bot import dp
+from handlers import texts
 from states import user as states
+from utils import db
 from utils import doc_gen
 
-from enum import Enum
+from number_to_string import get_string_by_number
+
+
+def get_text_variant(amount, variants):
+    if amount % 10 == 1 and amount % 100 != 11:
+        variant = 0
+    elif amount % 10 >= 2 and amount % 10 <= 4 and \
+            (amount % 100 < 10 or amount % 100 >= 20):
+        variant = 1
+    else:
+        variant = 2
+    return variants.split(", ")[variant]
 
 
 class DocTypes(Enum):
@@ -245,16 +259,15 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
             "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
         document_data["tbl_contents"] = document_data["products"]
         document_data["short_name"] = document_data["name"].replace("ООО ", "")
-        name = doc_gen.get_docx(document_data)
+        doc_name, bill_name = doc_gen.get_docx(document_data)
 
-        await call.message.answer_document(open(name + ".docx", "rb"), caption=texts.CreateDocument.finish)
-        await call.message.answer_document(open(name + "_bill.docx", "rb"), caption=texts.CreateDocument.finish)
-        await call.message.answer_document(open(name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
-        await call.message.answer_document(open(name + "_bill.pdf", "rb"), caption=texts.CreateDocument.finish)
-        await call.message.delete()
+        await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(doc_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(bill_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
+        # await call.message.delete()
         await state.finish()
         await call.answer()
-
         return
 
     await states.CreateDocument.next()
@@ -318,9 +331,41 @@ async def enter_price_product(message: Message, state: FSMContext):
         for product in data["products"]:
             products += texts.CreateDocument.product_info.format(**product)
             summa += product["cost"]
-        data["summa"] = round(summa, 2)
-        data["nds_summa"] = round(summa * data["nds"] * 0.01, 2)
+
+        if float(summa).is_integer():
+            data["summa"] = int(summa)
+            data["rubles"] = int(summa)
+            data["cents"] = "00"
+            data["cents_text"] = "00 копеек"
+        else:
+            data["summa"] = format(round(summa, 2), '.2f')
+            data["rubles"] = int(float(data["summa"]))
+
+            data["cents"] = str(data["summa"])[-2:]
+            data["cents_text"] = str(data["cents"]) + " " + get_text_variant(int(str(data["summa"])[-2:]),
+                                                                             "копейка, копейки, копеек")
+        data["rubles_text"] = str(data["rubles"]) + " " + get_text_variant(int(float(data["summa"])),
+                                                                           "рубль, рубля, рублей")
+        data["string_summa_text"] = get_string_by_number(summa)
+        data["summa_text"] = f'{data["rubles_text"]} {data["cents_text"]} ({data["string_summa_text"]})'
+        nds_summa = summa * data["nds"] * 0.01
+        if float(nds_summa).is_integer():
+            data["nds_summa"] = int(nds_summa)
+            data["nds_rubles"] = int(nds_summa)
+            data["nds_cents"] = "00"
+            data["nds_cents_text"] = "00 копеек"
+        else:
+            data["nds_summa"] = format(round(nds_summa, 2), '.2f')
+            data["nds_rubles"] = int(float(data["nds_summa"]))
+            data["nds_cents"] = str(data["nds_summa"])[-2:]
+            data["nds_cents_text"] = str(data["nds_cents"]) + " " + get_text_variant(int(str(data["nds_summa"])[-2:]),
+                                                                                     "копейка, копейки, копеек")
+
+        data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + get_text_variant(int(float(data["nds_summa"])),
+                                                                                  "рубль, рубля, рублей")
+        data["nds_summa_text"] = f'{data["nds_rubles_text"]} {data["nds_cents_text"]}'
         count = len(data["products"])
+        data["products_count"] = count
         msg_text = texts.CreateDocument.new_product.format(
             **data["products"][-1]) + products + texts.CreateDocument.products_stats.format(summa=summa, count=count)
         await message.answer(msg_text, reply_markup=user_kb.product_menu)
@@ -333,4 +378,3 @@ async def enter_price_product(message: Message, state: FSMContext):
 @dp.callback_query_handler(Text(startswith="doc_type"), state=states.CreateDocument.enter_doc_type)
 async def enter_doc_type(call: CallbackQuery, state: FSMContext):
     doc_type = int(call.data.split(":")[1])
-
