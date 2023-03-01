@@ -248,15 +248,13 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         name = doc_gen.get_docx(document_data)
 
         await call.message.answer_document(open(name + ".docx", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(name + "_bill.docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
+        await call.message.answer_document(open(name + "_bill.pdf", "rb"), caption=texts.CreateDocument.finish)
         await call.message.delete()
         await state.finish()
         await call.answer()
 
-        await states.CreateDocument.enter_doc_type.set()
-        await call.message.answer(texts.CreateDocument.enter_doc_type, reply_markup=user_kb.doc_type)
-        await call.answer()
-        await call.message.delete()
         return
 
     await states.CreateDocument.next()
