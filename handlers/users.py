@@ -261,7 +261,12 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data["short_name"] = document_data["name"].replace("ООО ", "")
         doc_name, bill_name = doc_gen.get_docx(document_data)
 
-        await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
+        if call.from_user.id in admin_ids:
+            kb = admin_kb.menu
+        else:
+            kb = user_kb.menu
+        await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish,
+                                           reply_markup=kb)
         await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(doc_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
@@ -362,7 +367,7 @@ async def enter_price_product(message: Message, state: FSMContext):
                                                                                      "копейка, копейки, копеек")
 
         data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + get_text_variant(int(float(data["nds_summa"])),
-                                                                                  "рубль, рубля, рублей")
+                                                                                   "рубль, рубля, рублей")
         data["nds_summa_text"] = f'{data["nds_rubles_text"]} {data["nds_cents_text"]}'
         count = len(data["products"])
         data["products_count"] = count
