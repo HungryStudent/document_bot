@@ -51,3 +51,12 @@ def get_docx(context):
     doc.save(bill_name + ".docx")
     convert_to_pdf(bill_name)
     return doc_name, bill_name
+
+
+def get_kp(context):
+    doc = DocxTemplate("documents/template_kp.docx")
+    doc.render(context)
+    today = datetime.datetime.now()
+    doc_name = "documents/" + f'КП {today.strftime("%d-%m-%y")}'
+    doc.save(doc_name + ".docx")
+    return doc_name

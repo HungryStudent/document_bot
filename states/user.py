@@ -27,3 +27,12 @@ class CreateDocument(StatesGroup):
     enter_type_product = State()
     enter_price_product = State()
     enter_doc_type = State()
+
+
+class ChangeMyInfo(StatesGroup):
+    fi = State()
+    role = State()
+    email = State()
+    number = State()
+    office_number = State()
+    site = State()

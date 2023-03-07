@@ -15,7 +15,9 @@ product_menu = InlineKeyboardMarkup(row_width=2).add(InlineKeyboardButton("До�
 doc_type = InlineKeyboardMarkup(row_width=2).add(InlineKeyboardButton("DOCX", callback_data="doc_type:1"),
                                                  InlineKeyboardButton("PDF", callback_data="doc_type:2"))
 
-menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(KeyboardButton("Создать договор"))
+menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(KeyboardButton("Создать договор"),
+                                                                  KeyboardButton("Создать КП"),
+                                                                  KeyboardButton("Изменить свои данные"))
 
 org_type = InlineKeyboardMarkup(row_width=2).add(InlineKeyboardButton("Юр. лицо", callback_data="org_type:1"),
                                                  InlineKeyboardButton("ИП", callback_data="org_type:2"))

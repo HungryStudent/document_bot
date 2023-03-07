@@ -34,6 +34,9 @@ class DocTypes(Enum):
 
 @dp.message_handler(commands='start')
 async def start_message(message: Message):
+    user = db.get_user(message.from_user.id)
+    if user is None:
+        db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     if message.from_user.id in admin_ids:
         await message.answer(texts.admin_hello_text, reply_markup=admin_kb.menu)
     else:

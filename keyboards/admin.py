@@ -8,7 +8,9 @@ bank_data = CallbackData("bank", "id")
 
 menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(KeyboardButton("Изменить поставщика"),
                                                                   KeyboardButton("Банки"),
-                                                                  KeyboardButton("Создать договор"))
+                                                                  KeyboardButton("Создать договор"),
+                                                                  KeyboardButton("Создать КП"),
+                                                                  KeyboardButton("Изменить свои данные"))
 
 accept_new_provider = InlineKeyboardMarkup(row_width=2).add(
     InlineKeyboardButton("Обновить", callback_data="new_provider_accept"),
