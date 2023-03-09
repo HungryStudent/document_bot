@@ -21,16 +21,6 @@ async def create_kp(message: Message):
     await message.answer("Введите номер коммерческого предложения")
     await CreateKP.number.set()
 
-    """name = doc_gen.get_kp(user)
-
-    if message.from_user.id in admin_ids:
-        kb = admin_kb.menu
-    else:
-        kb = user_kb.menu
-
-    await message.answer_document(open(name + ".docx", "rb"), caption="КП",
-                                  reply_markup=kb)"""
-
 
 @dp.message_handler(state=CreateKP.number)
 async def kp_number(message: Message, state: FSMContext):
@@ -185,7 +175,7 @@ async def change_my_info(message: Message):
 async def enter_fi(message: Message, state: FSMContext):
     await state.update_data(fi=message.text)
     await ChangeMyInfo.next()
-    await message.answer("Введите должность")
+    await message.answer("Введите должность: Менеджер отдела продаж")
 
 
 @dp.message_handler(state=ChangeMyInfo.role)
