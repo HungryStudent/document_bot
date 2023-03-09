@@ -36,3 +36,13 @@ class ChangeMyInfo(StatesGroup):
     number = State()
     office_number = State()
     site = State()
+
+
+class CreateKP(StatesGroup):
+    number = State()
+    nds = State()
+    product = State()
+    name_product = State()
+    count_product = State()
+    type_product = State()
+    price_product = State()

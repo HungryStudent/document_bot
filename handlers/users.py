@@ -15,16 +15,7 @@ from utils import doc_gen
 
 from number_to_string import get_string_by_number
 
-
-def get_text_variant(amount, variants):
-    if amount % 10 == 1 and amount % 100 != 11:
-        variant = 0
-    elif amount % 10 >= 2 and amount % 10 <= 4 and \
-            (amount % 100 < 10 or amount % 100 >= 20):
-        variant = 1
-    else:
-        variant = 2
-    return variants.split(", ")[variant]
+from utils import text_funcs
 
 
 class DocTypes(Enum):
@@ -350,9 +341,9 @@ async def enter_price_product(message: Message, state: FSMContext):
             data["rubles"] = int(float(data["summa"]))
 
             data["cents"] = str(data["summa"])[-2:]
-            data["cents_text"] = str(data["cents"]) + " " + get_text_variant(int(str(data["summa"])[-2:]),
+            data["cents_text"] = str(data["cents"]) + " " + text_funcs.get_text_variant(int(str(data["summa"])[-2:]),
                                                                              "копейка, копейки, копеек")
-        data["rubles_text"] = str(data["rubles"]) + " " + get_text_variant(int(float(data["summa"])),
+        data["rubles_text"] = str(data["rubles"]) + " " + text_funcs.get_text_variant(int(float(data["summa"])),
                                                                            "рубль, рубля, рублей")
         data["string_summa_text"] = get_string_by_number(summa)
         data["summa_text"] = f'{data["rubles_text"]} {data["cents_text"]} ({data["string_summa_text"]})'
@@ -366,11 +357,13 @@ async def enter_price_product(message: Message, state: FSMContext):
             data["nds_summa"] = format(round(nds_summa, 2), '.2f')
             data["nds_rubles"] = int(float(data["nds_summa"]))
             data["nds_cents"] = str(data["nds_summa"])[-2:]
-            data["nds_cents_text"] = str(data["nds_cents"]) + " " + get_text_variant(int(str(data["nds_summa"])[-2:]),
-                                                                                     "копейка, копейки, копеек")
+            data["nds_cents_text"] = str(data["nds_cents"]) + " " + text_funcs.get_text_variant(
+                int(str(data["nds_summa"])[-2:]),
+                "копейка, копейки, копеек")
 
-        data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + get_text_variant(int(float(data["nds_summa"])),
-                                                                                   "рубль, рубля, рублей")
+        data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + text_funcs.get_text_variant(
+            int(float(data["nds_summa"])),
+            "рубль, рубля, рублей")
         data["nds_summa_text"] = f'{data["nds_rubles_text"]} {data["nds_cents_text"]}'
         count = len(data["products"])
         data["products_count"] = count
@@ -381,8 +374,3 @@ async def enter_price_product(message: Message, state: FSMContext):
     await states.CreateDocument.enter_product.set()
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.delete()
-
-
-@dp.callback_query_handler(Text(startswith="doc_type"), state=states.CreateDocument.enter_doc_type)
-async def enter_doc_type(call: CallbackQuery, state: FSMContext):
-    doc_type = int(call.data.split(":")[1])

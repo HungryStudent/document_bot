@@ -57,6 +57,6 @@ def get_kp(context):
     doc = DocxTemplate("documents/template_kp.docx")
     doc.render(context)
     today = datetime.datetime.now()
-    doc_name = "documents/" + f'КП {today.strftime("%d-%m-%y")}'
+    doc_name = "documents/" + f'КП {context["number"]} {today.strftime("%d-%m-%y")}'
     doc.save(doc_name + ".docx")
     return doc_name
