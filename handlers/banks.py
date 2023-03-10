@@ -15,6 +15,7 @@ from utils import db
 from config import admin_ids
 
 
+@dp.message_handler(lambda m: m.from_user.id in admin_ids, commands="addbank")
 @dp.message_handler(lambda m: m.from_user.id in admin_ids, text="Банки")
 async def show_banks_menu(message: Message):
     await message.answer(texts.banks_menu, reply_markup=admin_kb.get_banks_menu())
@@ -23,7 +24,7 @@ async def show_banks_menu(message: Message):
 @dp.message_handler(lambda m: m.from_user.id in admin_ids, state="*", text="Отмена")
 async def cancel_change_provider(message: Message, state: FSMContext):
     await state.finish()
-    await message.answer(texts.cancel_input, reply_markup=admin_kb.menu)
+    await message.answer(texts.cancel_input)
 
 
 @dp.callback_query_handler(text="add_bank")
@@ -38,7 +39,7 @@ async def enter_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
 
     await message.answer(texts.Bank.enter_bik)
-    await message.bot.delete_message(message.chat.id, message.message_id-1)
+    await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.delete()
     await states.AddBank.next()
 
@@ -68,7 +69,7 @@ async def enter_correspondent(message: Message, state: FSMContext):
     await state.update_data(correspondent=message.text)
     bank_data = await state.get_data()
     db.add_bank(bank_data)
-    await message.answer(texts.Bank.finish, reply_markup=admin_kb.menu)
+    await message.answer(texts.Bank.finish)
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.delete()
     await state.finish()

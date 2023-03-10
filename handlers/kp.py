@@ -14,6 +14,7 @@ from states.user import ChangeMyInfo, CreateKP
 from utils import doc_gen, text_funcs, db
 
 
+@dp.message_handler(commands="createoffer")
 @dp.message_handler(text="Создать КП")
 async def create_kp(message: Message):
     user = db.get_user(message.from_user.id)
@@ -183,6 +184,7 @@ async def kp_price_product(message: Message, state: FSMContext):
     await message.delete()
 
 
+@dp.message_handler(commands="correctuserdata")
 @dp.message_handler(text="Изменить свои данные")
 async def change_my_info(message: Message):
     await message.answer("Введите ФИ", reply_markup=user_kb.cancel)

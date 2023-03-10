@@ -35,6 +35,7 @@ async def start_message(message: Message, state: FSMContext):
         await message.answer(texts.hello)
 
 
+@dp.message_handler(commands="createcontract")
 @dp.message_handler(text="Создать договор")
 async def start_create_document(message: Message):
     await states.CreateDocument.enter_provider_bank.set()

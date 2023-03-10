@@ -15,6 +15,7 @@ from utils import db
 from config import admin_ids
 
 
+@dp.message_handler(lambda m: m.from_user.id in admin_ids, commands="setcompany")
 @dp.message_handler(lambda m: m.from_user.id in admin_ids, text="Изменить поставщика")
 async def start_change_provider(message: Message):
     await message.answer(texts.Provider.enter_name, reply_markup=admin_kb.cancel)
@@ -24,7 +25,7 @@ async def start_change_provider(message: Message):
 @dp.message_handler(lambda m: m.from_user.id in admin_ids, state="*", text="Отмена")
 async def cancel_change_provider(message: Message, state: FSMContext):
     await state.finish()
-    await message.answer(texts.cancel_input, reply_markup=admin_kb.menu)
+    await message.answer(texts.cancel_input)
 
 
 @dp.message_handler(state=states.ChangeProvider.enter_name)
@@ -91,9 +92,9 @@ async def change_provider(call: CallbackQuery, state: FSMContext):
     if status == "accept":
         provider_data = await state.get_data()
         db.change_provider(provider_data)
-        await call.message.answer(texts.Provider.finish, reply_markup=admin_kb.menu)
+        await call.message.answer(texts.Provider.finish)
     elif status == "cancel":
-        await call.message.answer(texts.cancel_input, reply_markup=admin_kb.menu)
+        await call.message.answer(texts.cancel_input)
 
     await state.finish()
     await call.message.delete()
