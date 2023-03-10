@@ -252,7 +252,61 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data = {**document_data, **db.get_bank(document_data["provider_bank"])}
         document_data[
             "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
-        document_data["tbl_contents"] = document_data["products"]
+
+        products = document_data["products"]
+        document_products = []
+        summa = 0
+        for product in products:
+            document_products.append({"num": product["num"],
+                                      "name": product["name"],
+                                      "count": product["count"],
+                                      "type": product["type"],
+                                      "price": format(round(product["price"], 2), '.2f'),
+                                      "cost": format(round(product["count"] * product["price"], 2),
+                                                     '.2f')})
+            summa += product["cost"]
+
+        if float(summa).is_integer():
+            document_data["summa"] = format(int(summa), '.2f')
+            document_data["rubles"] = int(summa)
+            document_data["cents"] = "00"
+            document_data["cents_text"] = "00 копеек"
+        else:
+            document_data["summa"] = format(round(summa, 2), '.2f')
+            document_data["rubles"] = int(float(document_data["summa"]))
+
+            document_data["cents"] = str(document_data["summa"])[-2:]
+            document_data["cents_text"] = str(document_data["cents"]) + " " + text_funcs.get_text_variant(
+                int(str(document_data["summa"])[-2:]),
+                "копейка, копейки, копеек")
+        document_data["rubles_text"] = str(document_data["rubles"]) + " " + text_funcs.get_text_variant(
+            int(float(document_data["summa"])),
+            "рубль, рубля, рублей")
+        document_data["string_summa_text"] = get_string_by_number(summa)
+        document_data[
+            "summa_text"] = f'{document_data["rubles_text"]} {document_data["cents_text"]} ({document_data["string_summa_text"]})'
+        nds_summa = summa * document_data["nds"] * 0.01
+        if float(nds_summa).is_integer():
+            document_data["nds_summa"] = format(int(nds_summa), '.2f')
+            document_data["nds_rubles"] = int(nds_summa)
+            document_data["nds_cents"] = "00"
+            document_data["nds_cents_text"] = "00 копеек"
+        else:
+            document_data["nds_summa"] = format(round(nds_summa, 2), '.2f')
+            document_data["nds_rubles"] = int(float(document_data["nds_summa"]))
+            document_data["nds_cents"] = str(document_data["nds_summa"])[-2:]
+            document_data["nds_cents_text"] = str(document_data["nds_cents"]) + " " + text_funcs.get_text_variant(
+                int(str(document_data["nds_summa"])[-2:]),
+                "копейка, копейки, копеек")
+
+        document_data["nds_rubles_text"] = str(document_data["nds_rubles"]) + " " + text_funcs.get_text_variant(
+            int(float(document_data["nds_summa"])),
+            "рубль, рубля, рублей")
+        document_data["nds_summa_text"] = f'{document_data["nds_rubles_text"]} {document_data["nds_cents_text"]}'
+        count = len(document_data["products"])
+        document_data["products_count"] = count
+
+        document_data["tbl_contents"] = document_products
         document_data["short_name"] = document_data["name"].replace("ООО ", "")
         doc_name, bill_name = doc_gen.get_docx(document_data)
 
@@ -324,50 +378,15 @@ async def enter_price_product(message: Message, state: FSMContext):
                                  "name": data["name_product"],
                                  "count": data["count_product"],
                                  "type": user_kb.type_product_names[data["type_product"]],
-                                 "price": round(data["price_product"], 2),
-                                 "cost": round(data["count_product"] * data["price_product"], 2)})
+                                 "price": data["price_product"],
+                                 "cost": data["count_product"] * data["price_product"]})
         products = ""
         summa = 0
         for product in data["products"]:
             products += texts.CreateDocument.product_info.format(**product)
             summa += product["cost"]
-
-        if float(summa).is_integer():
-            data["summa"] = int(summa)
-            data["rubles"] = int(summa)
-            data["cents"] = "00"
-            data["cents_text"] = "00 копеек"
-        else:
-            data["summa"] = format(round(summa, 2), '.2f')
-            data["rubles"] = int(float(data["summa"]))
-
-            data["cents"] = str(data["summa"])[-2:]
-            data["cents_text"] = str(data["cents"]) + " " + text_funcs.get_text_variant(int(str(data["summa"])[-2:]),
-                                                                             "копейка, копейки, копеек")
-        data["rubles_text"] = str(data["rubles"]) + " " + text_funcs.get_text_variant(int(float(data["summa"])),
-                                                                           "рубль, рубля, рублей")
-        data["string_summa_text"] = get_string_by_number(summa)
-        data["summa_text"] = f'{data["rubles_text"]} {data["cents_text"]} ({data["string_summa_text"]})'
-        nds_summa = summa * data["nds"] * 0.01
-        if float(nds_summa).is_integer():
-            data["nds_summa"] = int(nds_summa)
-            data["nds_rubles"] = int(nds_summa)
-            data["nds_cents"] = "00"
-            data["nds_cents_text"] = "00 копеек"
-        else:
-            data["nds_summa"] = format(round(nds_summa, 2), '.2f')
-            data["nds_rubles"] = int(float(data["nds_summa"]))
-            data["nds_cents"] = str(data["nds_summa"])[-2:]
-            data["nds_cents_text"] = str(data["nds_cents"]) + " " + text_funcs.get_text_variant(
-                int(str(data["nds_summa"])[-2:]),
-                "копейка, копейки, копеек")
-
-        data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + text_funcs.get_text_variant(
-            int(float(data["nds_summa"])),
-            "рубль, рубля, рублей")
-        data["nds_summa_text"] = f'{data["nds_rubles_text"]} {data["nds_cents_text"]}'
         count = len(data["products"])
-        data["products_count"] = count
+        summa = round(summa, 2)
         msg_text = texts.CreateDocument.new_product.format(
             **data["products"][-1]) + products + texts.CreateDocument.products_stats.format(summa=summa, count=count)
         await message.answer(msg_text, reply_markup=user_kb.product_menu)
