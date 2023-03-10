@@ -30,9 +30,9 @@ async def start_message(message: Message, state: FSMContext):
     if user is None:
         db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     if message.from_user.id in admin_ids:
-        await message.answer(texts.admin_hello_text, reply_markup=admin_kb.menu)
+        await message.answer(texts.admin_hello_text)
     else:
-        await message.answer(texts.hello, reply_markup=user_kb.menu)
+        await message.answer(texts.hello)
 
 
 @dp.message_handler(text="Создать договор")
@@ -45,10 +45,11 @@ async def start_create_document(message: Message):
 @dp.message_handler(state="*", text="Отмена")
 async def cancel_user(message: Message, state: FSMContext):
     await state.finish()
-    await message.answer(texts.cancel_input, reply_markup=user_kb.menu)
+    await message.answer(texts.cancel_input)
 
 
-@dp.callback_query_handler(user_kb.bank_data.filter(), state=states.CreateDocument.enter_provider_bank)
+@dp.callback_query_handler(user_kb.bank_data.filter(),
+                           state=states.CreateDocument.enter_provider_bank)
 async def enter_provider_bank(call: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data(provider_bank=callback_data["id"])
 
@@ -310,12 +311,7 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data["short_name"] = document_data["name"].replace("ООО ", "")
         doc_name, bill_name = doc_gen.get_docx(document_data)
 
-        if call.from_user.id in admin_ids:
-            kb = admin_kb.menu
-        else:
-            kb = user_kb.menu
-        await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish,
-                                           reply_markup=kb)
+        await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(doc_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".pdf", "rb"), caption=texts.CreateDocument.finish)
