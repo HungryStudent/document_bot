@@ -109,6 +109,7 @@ async def kp_product(call: CallbackQuery, state: FSMContext):
         kp_name = doc_gen.get_kp(document_data)
 
         await call.message.answer_document(open(kp_name + ".docx", "rb"), caption="Документ создан")
+        await call.message.answer_document(open(kp_name + ".pdf", "rb"))
         await state.finish()
         await call.answer()
         await call.message.delete()

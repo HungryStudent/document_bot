@@ -3,38 +3,11 @@ import requests
 import json
 from docxtpl import DocxTemplate
 
+from docx2pdf import convert
+
 
 def convert_to_pdf(name):
-    instructions = {
-        'parts': [
-            {
-                'file': 'document'
-            }
-        ]
-    }
-
-    response = requests.request(
-        'POST',
-        'https://api.pspdfkit.com/build',
-        headers={
-            'Authorization': 'Bearer pdf_live_Y49xidbW78c9hozks6zNbnQcS8VS9OW4ScNXoDOhv7p'
-        },
-        files={
-            'document': open(name + ".docx", 'rb')
-        },
-        data={
-            'instructions': json.dumps(instructions)
-        },
-        stream=True
-    )
-
-    if response.ok:
-        with open(name + ".pdf", 'wb') as fd:
-            for chunk in response.iter_content(chunk_size=8096):
-                fd.write(chunk)
-    else:
-        print(response.text)
-        exit()
+    convert(name + ".docx", name + ".pdf")
 
 
 def get_docx(context):
@@ -59,4 +32,5 @@ def get_kp(context):
     today = datetime.datetime.now()
     doc_name = "documents/" + f'КП {context["number"]} {today.strftime("%d-%m-%y")}'
     doc.save(doc_name + ".docx")
+    convert_to_pdf(doc_name)
     return doc_name
