@@ -3,6 +3,8 @@ from contextlib import closing
 from datetime import datetime
 from sqlite3 import Connection, Cursor
 
+from config import admin_ids
+
 database = "utils/database.db"
 
 
@@ -17,7 +19,7 @@ def start():
     with closing(sqlite3.connect(database)) as connection:
         cursor = connection.cursor()
         cursor.execute(
-            "CREATE TABLE IF NOT EXISTS users(user_id INT, username TEXT, first_name TEXT, reg_time INT, fi TEXT, my_role TEXT, email TEXT, my_number TEXT, office_number TEXT, site TEXT)")
+            "CREATE TABLE IF NOT EXISTS users(user_id INT, username TEXT, first_name TEXT, reg_time INT, fi TEXT, my_role TEXT, email TEXT, my_number TEXT, office_number TEXT, site TEXT, is_activate BOOL)")
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS provider(name TEXT, address TEXT, inn TEXT, ogrn TEXT, "
             "bank_id INT, phone TEXT, email TEXT, director TEXT)")
@@ -39,8 +41,16 @@ def add_user(user_id, username, first_name):
         connection.row_factory = dict_factory
         cursor: Cursor = connection.cursor()
         cursor.execute(
-            "INSERT INTO users VALUES (?, ?, ?, ?, 'Иванов Иван', 'Менеджер', 'email@gmail.com', '+7 (999) 999-99-99', '+7 (495) 463-28-33', 'site.com')",
-            (user_id, username, first_name, int(datetime.now().timestamp())))
+            "INSERT INTO users VALUES (?, ?, ?, ?, 'Иванов Иван', 'Менеджер', 'email@gmail.com', '+7 (999) 999-99-99', '+7 (495) 463-28-33', 'site.com', ?)",
+            (user_id, username, first_name, int(datetime.now().timestamp()), user_id in admin_ids))
+        connection.commit()
+
+
+def activate_user(user_id):
+    with closing(sqlite3.connect(database)) as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE users SET is_activate = TRUE where user_id = ?", (user_id,))
         connection.commit()
 
 
