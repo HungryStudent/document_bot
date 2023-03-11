@@ -18,6 +18,8 @@ from utils import doc_gen, text_funcs, db
 @dp.message_handler(text="Создать КП")
 async def create_kp(message: Message):
     user = db.get_user(message.from_user.id)
+    if not user["is_activate"]:
+        return
 
     await message.answer("Введите номер коммерческого предложения")
     await message.delete()
@@ -187,6 +189,10 @@ async def kp_price_product(message: Message, state: FSMContext):
 @dp.message_handler(commands="correctuserdata")
 @dp.message_handler(text="Изменить свои данные")
 async def change_my_info(message: Message):
+    user = db.get_user(message.from_user.id)
+    if not user["is_activate"]:
+        return
+
     await message.answer("Введите ФИ", reply_markup=user_kb.cancel)
     await message.delete()
     await ChangeMyInfo.fi.set()

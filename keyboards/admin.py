@@ -6,6 +6,9 @@ from utils import db
 bank_admin_data = CallbackData("bank_admin", "id")
 bank_data = CallbackData("bank", "id")
 
+reject = InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton("❌ ЗАЯВКА ОТКЛОНЕНА ❌", callback_data="empty"))
+approve = InlineKeyboardMarkup(row_width=1).add(InlineKeyboardButton("✅ ЗАЯВКА ОДОБРЕНА ✅", callback_data="empty"))
+
 menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(KeyboardButton("Изменить поставщика"),
                                                                   KeyboardButton("Банки"),
                                                                   KeyboardButton("Создать договор"),
@@ -34,3 +37,9 @@ def get_banks():
     for bank in banks:
         kb.add(InlineKeyboardButton(bank["name"], callback_data=bank_data.new(bank["id"])))
     return kb
+
+
+def check_user(user_id):
+    return InlineKeyboardMarkup(row_width=2).add(
+        InlineKeyboardButton("Одобрить", callback_data=f"user:approve:{user_id}"),
+        InlineKeyboardButton("Отклонить", callback_data=f"user:reject:{user_id}"))

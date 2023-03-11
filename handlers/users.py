@@ -29,15 +29,22 @@ async def start_message(message: Message, state: FSMContext):
     user = db.get_user(message.from_user.id)
     if user is None:
         db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
+        await message.bot.send_message(admin_ids[0], f"""Новый пользователь:
+username: @{message.from_user.username}
+Имя: {message.from_user.first_name}""", reply_markup=admin_kb.check_user(message.from_user.id))
     if message.from_user.id in admin_ids:
         await message.answer(texts.admin_hello_text)
     else:
         await message.answer(texts.hello)
 
 
+
 @dp.message_handler(commands="createcontract")
 @dp.message_handler(text="Создать договор")
 async def start_create_document(message: Message):
+    user = db.get_user(message.from_user.id)
+    if not user["is_activate"]:
+        return
     await states.CreateDocument.enter_provider_bank.set()
     await message.answer("Начинаем создание", reply_markup=user_kb.cancel)
     await message.answer(texts.CreateDocument.enter_provider_bank, reply_markup=user_kb.get_banks())

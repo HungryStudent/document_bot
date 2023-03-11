@@ -16,3 +16,11 @@ from utils import db
 from config import admin_ids
 
 
+@dp.callback_query_handler(Text(startswith="user"))
+async def check_user(call: CallbackQuery):
+    if call.data.split(":")[1] == "approve":
+        await call.message.edit_reply_markup(reply_markup=admin_kb.approve)
+        db.activate_user(call.data.split(":")[2])
+        await call.bot.send_message(call.data.split(":")[2], "Аккаунт активирован")
+    elif call.data.split(":")[1] == "reject":
+        await call.message.edit_reply_markup(reply_markup=admin_kb.reject)
