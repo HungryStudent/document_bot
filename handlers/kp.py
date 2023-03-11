@@ -20,6 +20,7 @@ async def create_kp(message: Message):
     user = db.get_user(message.from_user.id)
 
     await message.answer("Введите номер коммерческого предложения")
+    await message.delete()
     await CreateKP.number.set()
 
 
@@ -28,6 +29,8 @@ async def kp_number(message: Message, state: FSMContext):
     await state.update_data(number=message.text)
     await CreateKP.next()
     await message.answer("Выберите НДС", reply_markup=user_kb.nds)
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.callback_query_handler(state=CreateKP.nds)
@@ -37,6 +40,7 @@ async def kp_nds(call: CallbackQuery, state: FSMContext):
     await CreateKP.next()
     await call.message.answer("Добавление товаров в спецификацию", reply_markup=user_kb.add_product)
     await call.answer()
+    await call.message.delete()
 
 
 @dp.callback_query_handler(state=CreateKP.product)
@@ -102,14 +106,10 @@ async def kp_product(call: CallbackQuery, state: FSMContext):
         document_data["tbl_contents"] = document_data["products"]
         kp_name = doc_gen.get_kp(document_data)
 
-        if call.from_user.id in admin_ids:
-            kb = admin_kb.menu
-        else:
-            kb = user_kb.menu
-        await call.message.answer_document(open(kp_name + ".docx", "rb"), caption="Документ создан",
-                                           reply_markup=kb)
+        await call.message.answer_document(open(kp_name + ".docx", "rb"), caption="Документ создан")
         await state.finish()
         await call.answer()
+        await call.message.delete()
         return
 
     await CreateKP.next()
@@ -188,6 +188,7 @@ async def kp_price_product(message: Message, state: FSMContext):
 @dp.message_handler(text="Изменить свои данные")
 async def change_my_info(message: Message):
     await message.answer("Введите ФИ", reply_markup=user_kb.cancel)
+    await message.delete()
     await ChangeMyInfo.fi.set()
 
 
@@ -196,6 +197,8 @@ async def enter_fi(message: Message, state: FSMContext):
     await state.update_data(fi=message.text)
     await ChangeMyInfo.next()
     await message.answer("Введите должность: Менеджер отдела продаж")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.message_handler(state=ChangeMyInfo.role)
@@ -203,6 +206,8 @@ async def enter_role(message: Message, state: FSMContext):
     await state.update_data(role=message.text)
     await ChangeMyInfo.next()
     await message.answer("Введите e-mail")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.message_handler(state=ChangeMyInfo.email)
@@ -210,6 +215,8 @@ async def enter_email(message: Message, state: FSMContext):
     await state.update_data(email=message.text)
     await ChangeMyInfo.next()
     await message.answer("Введите номер телефона")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.message_handler(state=ChangeMyInfo.number)
@@ -217,6 +224,8 @@ async def enter_number(message: Message, state: FSMContext):
     await state.update_data(number=message.text)
     await ChangeMyInfo.next()
     await message.answer("Введите номер офиса")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.message_handler(state=ChangeMyInfo.office_number)
@@ -224,6 +233,8 @@ async def enter_office_number(message: Message, state: FSMContext):
     await state.update_data(office_number=message.text)
     await ChangeMyInfo.next()
     await message.answer("Введите название сайта")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
 
 
 @dp.message_handler(state=ChangeMyInfo.site)
@@ -232,16 +243,13 @@ async def enter_site(message: Message, state: FSMContext):
     data = await state.get_data()
     db.change_my_info(data, message.from_user.id)
 
-    if message.from_user.id in admin_ids:
-        kb = admin_kb.menu
-    else:
-        kb = user_kb.menu
-
     await message.answer(f"""Ваши персональные данные обновлены:
 ФИ {data['fi']}
 Должность {data['role']}
 E-mail {data['email']}
 Номер телефона {data['number']}
 Номер офиса {data['office_number']}
-Название сайта {data['site']}""", reply_markup=kb)
+Название сайта {data['site']}""")
+    await message.bot.delete_message(message.from_user.id, message.message_id - 1)
+    await message.delete()
     await state.finish()
