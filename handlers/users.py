@@ -288,9 +288,13 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_products = []
         summa = 0
         for product in products:
+            if float(product["count"]).is_integer():
+                count = int(float(product["count"]))
+            else:
+                count = product["count"]
             document_products.append({"num": product["num"],
                                       "name": product["name"],
-                                      "count": product["count"],
+                                      "count": count,
                                       "type": product["type"],
                                       "price": format(round(product["price"], 2), '.2f'),
                                       "cost": format(round(product["count"] * product["price"], 2),
