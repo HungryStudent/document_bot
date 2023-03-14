@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 
 from aiogram.dispatcher import FSMContext
@@ -50,7 +51,13 @@ async def kp_product(call: CallbackQuery, state: FSMContext):
     if call.data == "finish_product":
         document_data = await state.get_data()
         user = db.get_user(call.from_user.id)
-        document_data = {**document_data, **user}
+        provider_data = db.get_provider()
+        provider_data[
+            "provider_fio_iniz"] = f'{provider_data["provider_fio"].split(" ")[0]} ' \
+                                   f'{provider_data["provider_fio"].split(" ")[1][0]}.' \
+                                   f'{provider_data["provider_fio"].split(" ")[2][0]}.'
+        document_data["now_date"] = datetime.datetime.now().strftime("%d.%m.%y")
+        document_data = {**document_data, **user, **provider_data}
 
         products = document_data["products"]
         document_products = []

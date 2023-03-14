@@ -31,5 +31,3 @@ else:
 data["nds_rubles_text"] = str(data["nds_rubles"]) + " " + get_text_variant(int(float(data["nds_summa"])),
                                                                            "рубль, рубля, рублей")
 data["nds_summa_text"] = f'{data["nds_rubles_text"]} {data["nds_cents_text"]}'
-
-print(data)

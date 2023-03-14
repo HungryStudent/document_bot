@@ -24,3 +24,10 @@ async def check_user(call: CallbackQuery):
         await call.bot.send_message(call.data.split(":")[2], "Аккаунт активирован")
     elif call.data.split(":")[1] == "reject":
         await call.message.edit_reply_markup(reply_markup=admin_kb.reject)
+
+
+@dp.message_handler(commands="ban")
+async def ban_user(message: Message):
+    name = message.get_args()
+    db.ban_user(name)
+    await message.answer("Пользователь исключен")

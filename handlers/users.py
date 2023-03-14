@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 
 from aiogram.dispatcher import FSMContext
@@ -36,7 +37,6 @@ username: @{message.from_user.username}
         await message.answer(texts.admin_hello_text)
     else:
         await message.answer(texts.hello)
-
 
 
 @dp.message_handler(commands="createcontract")
@@ -254,14 +254,36 @@ async def enter_email(message: Message, state: FSMContext):
     await message.delete()
 
 
+# @dp.callback_query_handler()
 @dp.callback_query_handler(state=states.CreateDocument.enter_product)
 async def enter_product(call: CallbackQuery, state: FSMContext):
     if call.data == "finish_product":
         document_data = await state.get_data()
-        document_data = {**document_data, **db.get_bank(document_data["provider_bank"])}
+        # document_data = {'provider_bank': '1', 'org_type': '2', 'nds': 10, 'number': '123123', 'inn': '123456789',
+        #                  'role': 'Генеральный директор', 'role_parent': 'Генерального директора',
+        #                  'name': 'ООО «Альбатрос»', 'kpp': '123456789', 'bank_name': 'Тинькофф Банк',
+        #                  'bik': '123456789', 'payment': '123456789', 'correspondent': '123456789', 'ogrn': '123456789',
+        #                  'address': '159050, г. Санкт-Петербург, Новый тупик, д.23, стр.4',
+        #                  'fio': 'Иванов Владимир Владимирович', 'fio_parent': 'Иванова Владимира Владимировича',
+        #                  'enter_phone': '+7(900)001-01-01', 'email': '123123asf', 'products': [
+        #         {'num': 1, 'name': 'fdvdv', 'count': 12.0, 'type': 'пара', 'price': 43.0, 'cost': 516.0}],
+        #                  'name_product': 'fdvdv', 'count_product': 12.0, 'type_product': 9, 'price_product': 43.0}
+        provider_data = db.get_provider()
+        provider_data[
+            "provider_fio_iniz"] = f'{provider_data["provider_fio"].split(" ")[0]} ' \
+                                   f'{provider_data["provider_fio"].split(" ")[1][0]}.' \
+                                   f'{provider_data["provider_fio"].split(" ")[2][0]}.'
+        adr = provider_data["provider_address"]
+        city_start = adr.find("город") + 6
+        if city_start == -1:
+            city_start = adr.find("г.") + 3
+        city_end = adr.find(',', adr.find(',') + 1)
+        provider_data["city"] = adr[city_start:city_end]
+        provider_data["provider_short_name"] = provider_data["provider_name"].replace("ООО ", "")
+        document_data = {**document_data, **db.get_bank(document_data["provider_bank"]), **provider_data}
         document_data[
             "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
-
+        document_data["now_date"] = datetime.datetime.now().strftime("%d.%m.%y")
         products = document_data["products"]
         document_products = []
         summa = 0

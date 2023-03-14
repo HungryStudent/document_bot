@@ -21,6 +21,21 @@ async def show_banks_menu(message: Message):
     await message.answer(texts.banks_menu, reply_markup=admin_kb.get_banks_menu())
 
 
+@dp.callback_query_handler(admin_kb.bank_admin_data.filter())
+async def show_bank(call: CallbackQuery, callback_data: dict):
+    bank = db.get_bank(callback_data["id"])
+    await call.message.answer(
+        f"{bank['provider_bank_name']}, БИК {bank['provider_bik']}, счёт {bank['provider_payment']}, КПП {bank['provider_correspondent']}",
+        reply_markup=admin_kb.get_bank(bank["id"]))
+    await call.answer()
+
+
+@dp.callback_query_handler(Text(startswith="delete_bank"))
+async def delete_bank(call: CallbackQuery):
+    db.delete_bank(call.data.split(":")[1])
+    await call.message.edit_text("Банк удален")
+
+
 @dp.message_handler(lambda m: m.from_user.id in admin_ids, state="*", text="Отмена")
 async def cancel_change_provider(message: Message, state: FSMContext):
     await state.finish()

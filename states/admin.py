@@ -6,11 +6,14 @@ class ChangeProvider(StatesGroup):
     enter_address = State()
     enter_inn = State()
     enter_ogrn = State()
-    enter_bank = State()
     enter_phone = State()
     enter_email = State()
+    enter_accountant = State()
     enter_role = State()
-    enter_parent_case_role = State()
+    enter_role_parent = State()
+    enter_fio = State()
+    enter_fio_parent = State()
+
     check = State()
 
 

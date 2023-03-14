@@ -19,14 +19,10 @@ class Provider:
 {address}
 ИНН/КПП {inn}
 ОГРН {ogrn}
-р/с {payment}
-{bank_name}
-к/с {correspondent}
-БИК {bik}
 Тел.: {phone}
 E-mail: {email}
 
-Директор {director}
+{role} {fio}
 
 Обновляем поставщика?
 """

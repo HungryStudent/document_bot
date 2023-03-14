@@ -39,6 +39,11 @@ def get_banks():
     return kb
 
 
+def get_bank(bank_id):
+    return InlineKeyboardMarkup(row_width=1).add(
+        InlineKeyboardButton("Удалить банк", callback_data=f"delete_bank:{bank_id}"))
+
+
 def check_user(user_id):
     return InlineKeyboardMarkup(row_width=2).add(
         InlineKeyboardButton("Одобрить", callback_data=f"user:approve:{user_id}"),

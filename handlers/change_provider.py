@@ -56,18 +56,8 @@ async def enter_inn(message: Message, state: FSMContext):
 async def enter_ogrn(message: Message, state: FSMContext):
     await state.update_data(ogrn=message.text)
 
-    await message.answer(texts.Provider.enter_bank_id, reply_markup=admin_kb.get_banks())
+    await message.answer(texts.Provider.enter_phone)
     await states.ChangeProvider.next()
-
-
-@dp.callback_query_handler(admin_kb.bank_data.filter(), state=states.ChangeProvider.enter_bank)
-async def enter_bank(call: CallbackQuery, state: FSMContext, callback_data: dict):
-    bank_id = callback_data["id"]
-    await state.update_data(bank_id=bank_id)
-
-    await call.message.answer(texts.Provider.enter_phone)
-    await states.ChangeProvider.next()
-    await call.answer()
 
 
 @dp.message_handler(state=states.ChangeProvider.enter_phone)
@@ -82,7 +72,54 @@ async def enter_phone(message: Message, state: FSMContext):
 async def enter_email(message: Message, state: FSMContext):
     await state.update_data(email=message.text)
 
-    await message.answer(texts.Provider.enter_director)
+    await message.answer("Введите имя бухгалтера")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_accountant)
+async def enter_accountant(message: Message, state: FSMContext):
+    await state.update_data(accountant=message.text)
+
+    await message.answer("Введите должность")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_role)
+async def enter_role(message: Message, state: FSMContext):
+    await state.update_data(role=message.text)
+
+    await message.answer("Введите должность в родительном падеже")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_role_parent)
+async def enter_role_parent(message: Message, state: FSMContext):
+    await state.update_data(role_parent=message.text)
+
+    await message.answer("Введите ФИО")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_fio)
+async def enter_fio(message: Message, state: FSMContext):
+    if len(message.text.split(" ")) != 3:
+        await message.answer(texts.CreateDocument.fio_error)
+        return
+    await state.update_data(fio=message.text)
+
+    await message.answer("Введите ФИО в родительном падеже")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_fio_parent)
+async def enter_fio_parent(message: Message, state: FSMContext):
+    if len(message.text.split(" ")) != 3:
+        await message.answer(texts.CreateDocument.fio_error)
+        return
+    await state.update_data(fio_parent=message.text)
+
+    data = await state.get_data()
+    await message.answer(texts.Provider.check.format(**data), reply_markup=admin_kb.accept_new_provider)
     await states.ChangeProvider.next()
 
 
