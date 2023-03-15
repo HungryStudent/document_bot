@@ -275,7 +275,7 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
                                    f'{provider_data["provider_fio"].split(" ")[2][0]}.'
         adr = provider_data["provider_address"]
         city_start = adr.find("город") + 6
-        if city_start == -1:
+        if city_start == 5:
             city_start = adr.find("г.") + 3
         city_end = adr.find(',', adr.find(',') + 1)
         provider_data["city"] = adr[city_start:city_end]
