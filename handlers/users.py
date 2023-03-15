@@ -283,7 +283,7 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data = {**document_data, **db.get_bank(document_data["provider_bank"]), **provider_data}
         document_data[
             "fio_iniz"] = f'{document_data["fio"].split(" ")[0]} {document_data["fio"].split(" ")[1][0]}.{document_data["fio"].split(" ")[2][0]}.'
-        document_data["now_date"] = datetime.datetime.now().strftime("%d.%m.%y")
+        document_data["now_date"] = datetime.datetime.now().strftime("%d.%m.%Y")
         products = document_data["products"]
         document_products = []
         summa = 0
