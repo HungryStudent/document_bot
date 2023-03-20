@@ -70,6 +70,10 @@ async def enter_provider_bank(call: CallbackQuery, state: FSMContext, callback_d
 
 @dp.callback_query_handler(state=states.CreateDocument.enter_org_type)
 async def enter_org_type(call: CallbackQuery, state: FSMContext):
+    if call.data == "cancel_doc":
+        await state.finish()
+        await call.message.edit_text("Создание отменено")
+        return
     await state.update_data(org_type=call.data.split(":")[1])
 
     await states.CreateDocument.next()
@@ -102,6 +106,11 @@ async def enter_number(message: Message, state: FSMContext):
 async def enter_inn(message: Message, state: FSMContext):
     await state.update_data(inn=message.text)
 
+    data = await state.get_data()
+    if data["org_type"] == "2":
+        await message.answer(texts.CreateDocument.enter_bank_name)
+        await states.CreateDocument.enter_bank_name.set()
+        return
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_role)
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
@@ -342,8 +351,13 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data["products_count"] = count
 
         document_data["tbl_contents"] = document_products
-        document_data["short_name"] = document_data["name"].replace("ООО ", "")
-        doc_name, bill_name = doc_gen.get_docx(document_data)
+
+
+        if document_data["org_type"] == "1":
+            document_data["short_name"] = document_data["name"].replace("ООО ", "")
+            doc_name, bill_name = doc_gen.get_docx(document_data)
+        elif document_data["org_type"] == "2":
+            doc_name, bill_name = doc_gen.get_docx(document_data, is_ip=True)
 
         await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)

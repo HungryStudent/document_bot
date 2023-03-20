@@ -20,7 +20,8 @@ menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(KeyboardButton
                                                                   KeyboardButton("Изменить свои данные"))
 
 org_type = InlineKeyboardMarkup(row_width=2).add(InlineKeyboardButton("Юр. лицо", callback_data="org_type:1"),
-                                                 InlineKeyboardButton("ИП", callback_data="org_type:2"))
+                                                 InlineKeyboardButton("ИП", callback_data="org_type:2"),
+                                                 InlineKeyboardButton("Отмена", callback_data="cancel_doc"))
 nds = InlineKeyboardMarkup(row_width=3).add(InlineKeyboardButton("0%", callback_data="nds:0"),
                                             InlineKeyboardButton("10%", callback_data="nds:10"),
                                             InlineKeyboardButton("20%", callback_data="nds:20"))
