@@ -148,7 +148,7 @@ async def enter_name(message: Message, state: FSMContext):
 
 
 @dp.message_handler(state=states.CreateDocument.enter_kpp)
-async def v(message: Message, state: FSMContext):
+async def enter_kpp(message: Message, state: FSMContext):
     await state.update_data(kpp=message.text)
 
     await states.CreateDocument.next()
@@ -223,6 +223,12 @@ async def enter_fio(message: Message, state: FSMContext):
         await message.answer(texts.CreateDocument.fio_error)
         return
     await state.update_data(fio=message.text)
+
+    data = await state.get_data()
+    if data["org_type"] == "2":
+        await message.answer(texts.CreateDocument.enter_phone)
+        await states.CreateDocument.enter_phone.set()
+        return
 
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_fio_parent)
