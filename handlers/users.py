@@ -98,8 +98,8 @@ async def enter_number(message: Message, state: FSMContext):
 
     data = await state.get_data()
     if data["org_type"] in ["3"]:
-        await message.answer(texts.CreateDocument.enter_address)
-        await states.CreateDocument.enter_address.set()
+        await message.answer(texts.CreateDocument.enter_fio)
+        await states.CreateDocument.enter_fio.set()
         await message.bot.delete_message(message.chat.id, message.message_id - 1)
         await message.delete()
         return
