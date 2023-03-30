@@ -88,7 +88,7 @@ def get_provider():
         connection.row_factory = dict_factory
         cursor: Cursor = connection.cursor()
         cursor.execute(
-            "SELECT name as provider_name, address as provider_address, inn as provid_inn, ogrn as provider_ogrn, "
+            "SELECT name as provider_name, address as provider_address, inn as provider_inn, ogrn as provider_ogrn, "
             "phone as provider_phone, email as provider_email, my_role as provider_role,"
             "role_parent as provider_role_parent, fio as provider_fio, fio_parent as provider_fio_parent, accountant "
             "FROM provider")

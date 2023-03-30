@@ -10,10 +10,12 @@ def convert_to_pdf(name):
     convert(name + ".docx", name + ".pdf")
 
 
-def get_docx(context, is_ip=False):
+def get_docx(context, is_ip=False, is_fiz=False):
     doc = DocxTemplate("documents/template.docx")
     if is_ip:
         doc = DocxTemplate("documents/template_ip.docx")
+    if is_fiz:
+        doc = DocxTemplate("documents/template_fiz.docx")
     doc.render(context)
     today = datetime.datetime.now()
     doc_name = "documents/" + f'Договор {context["number"]} {today.strftime("%d-%m-%y")}'
@@ -23,6 +25,8 @@ def get_docx(context, is_ip=False):
     doc = DocxTemplate("documents/template_bill.docx")
     if is_ip:
         doc = DocxTemplate("documents/template_bill_ip.docx")
+    if is_fiz:
+        doc = DocxTemplate("documents/template_bill_fiz.docx")
     doc.render(context)
     bill_name = "documents/" + f'Счет {context["number"]} {today.strftime("%d-%m-%y")}'
     doc.save(bill_name + ".docx")

@@ -21,6 +21,8 @@ class CreateDocument(StatesGroup):
     enter_fio_parent = State()
     enter_phone = State()
     enter_email = State()
+    enter_prepaid_expense = State()
+    enter_delivery_address = State()
     enter_product = State()
     enter_name_product = State()
     enter_count_product = State()

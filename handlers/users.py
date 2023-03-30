@@ -107,9 +107,11 @@ async def enter_inn(message: Message, state: FSMContext):
     await state.update_data(inn=message.text)
 
     data = await state.get_data()
-    if data["org_type"] == "2":
-        await message.answer(texts.CreateDocument.enter_bank_name)
-        await states.CreateDocument.enter_bank_name.set()
+    if data["org_type"] in ["2", "3"]:
+        await message.answer(texts.CreateDocument.enter_kpp)
+        await states.CreateDocument.enter_kpp.set()
+        await message.bot.delete_message(message.chat.id, message.message_id - 1)
+        await message.delete()
         return
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_role)
@@ -225,9 +227,11 @@ async def enter_fio(message: Message, state: FSMContext):
     await state.update_data(fio=message.text)
 
     data = await state.get_data()
-    if data["org_type"] == "2":
+    if data["org_type"] in ["2", "3"]:
         await message.answer(texts.CreateDocument.enter_phone)
         await states.CreateDocument.enter_phone.set()
+        await message.bot.delete_message(message.chat.id, message.message_id - 1)
+        await message.delete()
         return
 
     await states.CreateDocument.next()
@@ -263,13 +267,37 @@ async def enter_phone(message: Message, state: FSMContext):
 async def enter_email(message: Message, state: FSMContext):
     await state.update_data(email=message.text)
     await state.update_data(products=[])
+
+    data = await state.get_data()
+    if data["org_type"] in ["3"]:
+        await message.answer("Введите размер аванса", reply_markup=user_kb.prepaid_expense)
+        await states.CreateDocument.next()
+        await message.bot.delete_message(message.chat.id, message.message_id - 1)
+        await message.delete()
+        return
+
+    await states.CreateDocument.enter_product.set()
+    await message.answer(texts.CreateDocument.enter_product, reply_markup=user_kb.add_product)
+    await message.bot.delete_message(message.chat.id, message.message_id - 1)
+    await message.delete()
+
+
+@dp.callback_query_handler(Text(startswith="prepaid_expense:"), state=states.CreateDocument.enter_prepaid_expense)
+async def enter_prepaid_expense(call: CallbackQuery, state: FSMContext):
+    await state.update_data(prepaid_expense=call.data.split(":")[1])
+    await states.CreateDocument.next()
+    await call.message.edit_text("Введите адрес доставки")
+
+
+@dp.message_handler(state=states.CreateDocument.enter_delivery_address)
+async def enter_delivery_address(message: Message, state: FSMContext):
+    await state.update_data(delivery_address=message.text)
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_product, reply_markup=user_kb.add_product)
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.delete()
 
 
-# @dp.callback_query_handler()
 @dp.callback_query_handler(state=states.CreateDocument.enter_product)
 async def enter_product(call: CallbackQuery, state: FSMContext):
     if call.data == "finish_product":
@@ -358,12 +386,13 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
 
         document_data["tbl_contents"] = document_products
 
-
         if document_data["org_type"] == "1":
             document_data["short_name"] = document_data["name"].replace("ООО ", "")
             doc_name, bill_name = doc_gen.get_docx(document_data)
         elif document_data["org_type"] == "2":
             doc_name, bill_name = doc_gen.get_docx(document_data, is_ip=True)
+        elif document_data["org_type"] == "3":
+            doc_name, bill_name = doc_gen.get_docx(document_data, is_fiz=True)
 
         await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
