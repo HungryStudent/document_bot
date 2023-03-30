@@ -263,7 +263,7 @@ async def enter_fio_parent(message: Message, state: FSMContext):
 
 @dp.message_handler(state=states.CreateDocument.enter_phone)
 async def enter_phone(message: Message, state: FSMContext):
-    await state.update_data(enter_phone=message.text)
+    await state.update_data(phone=message.text)
 
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_email)
