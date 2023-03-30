@@ -25,7 +25,7 @@ async def show_banks_menu(message: Message):
 async def show_bank(call: CallbackQuery, callback_data: dict):
     bank = db.get_bank(callback_data["id"])
     await call.message.answer(
-        f"{bank['provider_bank_name']}, БИК {bank['provider_bik']}, счёт {bank['provider_payment']}, КПП {bank['provider_correspondent']}",
+        f"{bank['provider_bank_name']}, БИК {bank['provider_bik']}, счёт {bank['provider_payment']}, кор. счёт {bank['provider_correspondent']}",
         reply_markup=admin_kb.get_bank(bank["id"]))
     await call.answer()
 

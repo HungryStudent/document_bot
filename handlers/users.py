@@ -96,6 +96,14 @@ async def enter_nds(call: CallbackQuery, state: FSMContext):
 async def enter_number(message: Message, state: FSMContext):
     await state.update_data(number=message.text)
 
+    data = await state.get_data()
+    if data["org_type"] in ["3"]:
+        await message.answer(texts.CreateDocument.enter_address)
+        await states.CreateDocument.enter_address.set()
+        await message.bot.delete_message(message.chat.id, message.message_id - 1)
+        await message.delete()
+        return
+
     await states.CreateDocument.next()
     await message.answer(texts.CreateDocument.enter_inn)
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
@@ -107,7 +115,7 @@ async def enter_inn(message: Message, state: FSMContext):
     await state.update_data(inn=message.text)
 
     data = await state.get_data()
-    if data["org_type"] in ["2", "3"]:
+    if data["org_type"] in ["2"]:
         await message.answer(texts.CreateDocument.enter_kpp)
         await states.CreateDocument.enter_kpp.set()
         await message.bot.delete_message(message.chat.id, message.message_id - 1)
@@ -227,7 +235,7 @@ async def enter_fio(message: Message, state: FSMContext):
     await state.update_data(fio=message.text)
 
     data = await state.get_data()
-    if data["org_type"] in ["2", "3"]:
+    if data["org_type"] in ["2"]:
         await message.answer(texts.CreateDocument.enter_phone)
         await states.CreateDocument.enter_phone.set()
         await message.bot.delete_message(message.chat.id, message.message_id - 1)
@@ -330,6 +338,7 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         products = document_data["products"]
         document_products = []
         summa = 0
+
         for product in products:
             if float(product["count"]).is_integer():
                 count = int(float(product["count"]))
@@ -392,7 +401,8 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         elif document_data["org_type"] == "2":
             doc_name, bill_name = doc_gen.get_docx(document_data, is_ip=True)
         elif document_data["org_type"] == "3":
-            doc_name, bill_name = doc_gen.get_docx(document_data, is_fiz=True)
+            doc_name, bill_name = doc_gen.get_docx(document_data, is_fiz=True,
+                                                   has_email=not document_data["email"] == "-")
 
         await call.message.answer_document(open(doc_name + ".docx", "rb"), caption=texts.CreateDocument.finish)
         await call.message.answer_document(open(bill_name + ".docx", "rb"), caption=texts.CreateDocument.finish)

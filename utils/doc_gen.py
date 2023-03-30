@@ -10,12 +10,15 @@ def convert_to_pdf(name):
     convert(name + ".docx", name + ".pdf")
 
 
-def get_docx(context, is_ip=False, is_fiz=False):
+def get_docx(context, is_ip=False, is_fiz=False, has_email=True):
     doc = DocxTemplate("documents/template.docx")
     if is_ip:
         doc = DocxTemplate("documents/template_ip.docx")
     if is_fiz:
-        doc = DocxTemplate("documents/template_fiz.docx")
+        if has_email:
+            doc = DocxTemplate("documents/template_fiz.docx")
+        else:
+            doc = DocxTemplate("documents/template_fiz_without_email.docx")
     doc.render(context)
     today = datetime.datetime.now()
     doc_name = "documents/" + f'Договор {context["number"]} {today.strftime("%d-%m-%y")}'
