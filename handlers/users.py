@@ -235,7 +235,7 @@ async def enter_fio(message: Message, state: FSMContext):
     await state.update_data(fio=message.text)
 
     data = await state.get_data()
-    if data["org_type"] in ["2"]:
+    if data["org_type"] in ["2", "3"]:
         await message.answer(texts.CreateDocument.enter_phone)
         await states.CreateDocument.enter_phone.set()
         await message.bot.delete_message(message.chat.id, message.message_id - 1)
