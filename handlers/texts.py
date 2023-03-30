@@ -5,7 +5,7 @@ banks_menu = "Список банков"
 
 
 class Provider:
-    enter_name = "Введите название организации"
+    enter_name = "Введите название организации\nПример: ООО «Альбатрос»"
     enter_address = "Введите адрес"
     enter_inn = "Введите ИНН"
     enter_ogrn = "Введите ОГРН"
