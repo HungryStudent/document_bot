@@ -276,25 +276,25 @@ async def enter_email(message: Message, state: FSMContext):
     await state.update_data(email=message.text)
     await state.update_data(products=[])
 
-    data = await state.get_data()
-    if data["org_type"] in ["3"]:
-        await message.answer("Введите размер аванса", reply_markup=user_kb.prepaid_expense)
-        await states.CreateDocument.next()
-        await message.bot.delete_message(message.chat.id, message.message_id - 1)
-        await message.delete()
-        return
-
-    await states.CreateDocument.enter_product.set()
-    await message.answer(texts.CreateDocument.enter_product, reply_markup=user_kb.add_product)
+    await message.answer("Введите размер аванса", reply_markup=user_kb.prepaid_expense)
+    await states.CreateDocument.next()
     await message.bot.delete_message(message.chat.id, message.message_id - 1)
     await message.delete()
+    return
 
 
 @dp.callback_query_handler(Text(startswith="prepaid_expense:"), state=states.CreateDocument.enter_prepaid_expense)
 async def enter_prepaid_expense(call: CallbackQuery, state: FSMContext):
     await state.update_data(prepaid_expense=call.data.split(":")[1])
-    await states.CreateDocument.next()
-    await call.message.edit_text("Введите адрес доставки")
+
+    data = await state.get_data()
+    if data["org_type"] in ["3"]:
+        await states.CreateDocument.next()
+        await call.message.edit_text("Введите адрес доставки")
+        return
+
+    await states.CreateDocument.enter_product.set()
+    await call.message.edit_text(texts.CreateDocument.enter_product, reply_markup=user_kb.add_product)
 
 
 @dp.message_handler(state=states.CreateDocument.enter_delivery_address)

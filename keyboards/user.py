@@ -28,6 +28,7 @@ nds = InlineKeyboardMarkup(row_width=3).add(InlineKeyboardButton("0%", callback_
                                             InlineKeyboardButton("20%", callback_data="nds:20"))
 
 prepaid_expense = InlineKeyboardMarkup(row_width=3).add(
+    InlineKeyboardButton("30%", callback_data="prepaid_expense:30"),
     InlineKeyboardButton("50%", callback_data="prepaid_expense:50"),
     InlineKeyboardButton("70%", callback_data="prepaid_expense:70"),
     InlineKeyboardButton("100%", callback_data="prepaid_expense:100"))
