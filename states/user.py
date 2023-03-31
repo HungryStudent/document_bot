@@ -43,6 +43,7 @@ class ChangeMyInfo(StatesGroup):
 class CreateKP(StatesGroup):
     number = State()
     nds = State()
+    enter_prepaid_expense = State()
     product = State()
     name_product = State()
     count_product = State()

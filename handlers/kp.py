@@ -40,10 +40,16 @@ async def kp_number(message: Message, state: FSMContext):
 async def kp_nds(call: CallbackQuery, state: FSMContext):
     await state.update_data(nds=int(call.data.split(":")[1]))
     await state.update_data(products=[])
+
+    await call.message.edit_text("Введите размер аванса", reply_markup=user_kb.prepaid_expense)
     await CreateKP.next()
-    await call.message.answer("Добавление товаров в спецификацию", reply_markup=user_kb.add_product)
-    await call.answer()
-    await call.message.delete()
+
+
+@dp.callback_query_handler(Text(startswith="prepaid_expense:"), state=CreateKP.enter_prepaid_expense)
+async def enter_prepaid_expense(call: CallbackQuery, state: FSMContext):
+    await state.update_data(prepaid_expense=call.data.split(":")[1])
+    await CreateKP.next()
+    await call.message.edit_text("Добавление товаров в спецификацию", reply_markup=user_kb.add_product)
 
 
 @dp.callback_query_handler(state=CreateKP.product)
