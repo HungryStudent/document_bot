@@ -21,7 +21,7 @@ def start():
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS users(user_id INT, username TEXT, first_name TEXT, reg_time INT, fi TEXT, my_role TEXT, email TEXT, my_number TEXT, office_number TEXT, site TEXT, is_activate BOOL)")
         cursor.execute(
-            "CREATE TABLE IF NOT EXISTS provider(name TEXT, address TEXT, inn TEXT, ogrn TEXT, phone TEXT, email TEXT, accountant TEXT, my_role TEXT, role_parent TEXT, fio TEXT, fio_parent TEXT)")
+            "CREATE TABLE IF NOT EXISTS provider(name TEXT, address TEXT, inn TEXT, kpp TEXT, ogrn TEXT, phone TEXT, email TEXT, accountant TEXT, my_role TEXT, role_parent TEXT, fio TEXT, fio_parent TEXT)")
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS banks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, bik TEXT, payment TEXT, correspondent TEXT)")
         connection.commit()
@@ -76,8 +76,9 @@ def change_provider(provider_data):
         cursor = connection.cursor()
         cursor.execute("DELETE FROM provider")
         cursor.execute(
-            "INSERT INTO provider VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (provider_data["name"], provider_data["address"], provider_data["inn"], provider_data["ogrn"],
+            "INSERT INTO provider VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (provider_data["name"], provider_data["address"], provider_data["inn"], provider_data["kpp"],
+             provider_data["ogrn"],
              provider_data["phone"], provider_data["email"], provider_data["accountant"], provider_data["role"],
              provider_data["role_parent"], provider_data["fio"], provider_data["fio_parent"]))
         connection.commit()
@@ -88,7 +89,7 @@ def get_provider():
         connection.row_factory = dict_factory
         cursor: Cursor = connection.cursor()
         cursor.execute(
-            "SELECT name as provider_name, address as provider_address, inn as provider_inn, ogrn as provider_ogrn, "
+            "SELECT name as provider_name, address as provider_address, inn as provider_inn, kpp as provider_kpp, ogrn as provider_ogrn, "
             "phone as provider_phone, email as provider_email, my_role as provider_role,"
             "role_parent as provider_role_parent, fio as provider_fio, fio_parent as provider_fio_parent, accountant "
             "FROM provider")

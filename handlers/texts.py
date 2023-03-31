@@ -17,7 +17,7 @@ class Provider:
 {name}
 Юридический и почтовый адрес:
 {address}
-ИНН/КПП {inn}
+ИНН/КПП {inn}/{kpp}
 ОГРН {ogrn}
 Тел.: {phone}
 E-mail: {email}

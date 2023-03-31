@@ -5,6 +5,7 @@ class ChangeProvider(StatesGroup):
     enter_name = State()
     enter_address = State()
     enter_inn = State()
+    enter_kpp = State()
     enter_ogrn = State()
     enter_phone = State()
     enter_email = State()

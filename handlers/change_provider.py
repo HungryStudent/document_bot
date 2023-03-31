@@ -48,6 +48,14 @@ async def enter_address(message: Message, state: FSMContext):
 async def enter_inn(message: Message, state: FSMContext):
     await state.update_data(inn=message.text)
 
+    await message.answer("Введите КПП")
+    await states.ChangeProvider.next()
+
+
+@dp.message_handler(state=states.ChangeProvider.enter_kpp)
+async def enter_kpp(message: Message, state: FSMContext):
+    await state.update_data(kpp=message.text)
+
     await message.answer(texts.Provider.enter_ogrn)
     await states.ChangeProvider.next()
 
