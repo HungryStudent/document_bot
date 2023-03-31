@@ -392,7 +392,12 @@ async def enter_product(call: CallbackQuery, state: FSMContext):
         document_data["nds_summa_text"] = f'{document_data["nds_rubles_text"]} {document_data["nds_cents_text"]}'
         count = len(document_data["products"])
         document_data["products_count"] = count
-
+        if document_data["prepaid_expense"] == "100":
+            document_data[
+                "prepaid_expense_text"] = "Оплата Товара производится в размере 100% на расчетный счет Поставщика в течение 2 (двух) рабочих дней от даты выставленного счета."
+        else:
+            document_data[
+                "prepaid_expense_text"] = f"Оплата Товара производится в размере авансового платежа {document_data['prepaid_expense']}% на расчетный счет Поставщика в течение 2 (двух) рабочих дней от даты выставленного счета, остаток суммы оплачивается безналичным платежом в момент доставки Товара."
         document_data["tbl_contents"] = document_products
 
         if document_data["org_type"] == "1":
