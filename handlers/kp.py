@@ -101,7 +101,13 @@ async def kp_product(call: CallbackQuery, state: FSMContext):
         document_data["string_summa_text"] = get_string_by_number(summa)
         document_data[
             "summa_text"] = f'{document_data["rubles_text"]} {document_data["cents_text"]} ({document_data["string_summa_text"]})'
-        nds_summa = summa * document_data["nds"] * 0.01
+
+        if document_data["nds"] == 20:
+            nds_summa = summa / 6
+        elif document_data["nds"] == 10:
+            nds_summa = summa / 11
+        else:
+            nds_summa = 0
         if float(nds_summa).is_integer():
             document_data["nds_summa"] = format(int(nds_summa), '.2f')
             document_data["nds_rubles"] = int(nds_summa)
